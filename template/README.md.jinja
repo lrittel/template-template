@@ -4,8 +4,8 @@ Usage:
 
 ```bash
 # Without Nix
-copier copy "https://github.com/{{ github_repo }}.git" <destination>
+copier copy --trust "https://github.com/{{ github_repo }}.git" <destination>
 
 # With Nix
-nix run "github:{{ github_repo }}" -- copy <destination>
+nix run "github:{{ github_repo }}" -- copy --trust <destination>
 ```

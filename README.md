@@ -17,8 +17,8 @@ Usage:
 
 ```bash
 # Without Nix
-copier copy "https://github.com/lrittel/template-template.git" <destination>
+copier copy --trust "https://github.com/lrittel/template-template.git" <destination>
 
 # With Nix
-nix run "github:lrittel/template-template" -- copy <destination>
+nix run "github:lrittel/template-template" -- copy --trust <destination>
 ```
