@@ -1,0 +1,65 @@
+{
+  description = "A development environment as a Nix Flake";
+
+  inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-26.05";
+  };
+
+  outputs =
+    {
+      # self,
+      nixpkgs,
+      ...
+    }:
+    let
+      systems = [ "x86_64-linux" ];
+      forAllSystems = nixpkgs.lib.genAttrs systems;
+      mkPkgs =
+        system:
+        import nixpkgs {
+          inherit system;
+          config = {
+            allowUnfree = true;
+          };
+          overlays = [ ];
+        };
+      requiredTools =
+        pkgs: with pkgs; [
+          copier
+          just
+        ];
+    in
+    {
+      devShells = forAllSystems (system: {
+        default =
+          let
+            pkgs = mkPkgs system;
+          in
+          pkgs.mkShell {
+            packages = requiredTools pkgs;
+
+            shellHook = ''
+              echo "Starting development environment..."
+            '';
+          };
+      });
+
+      apps = forAllSystems (system: {
+        default =
+          let
+            pkgs = mkPkgs system;
+            package = pkgs.writeShellApplication {
+              name = "run-copier";
+              runtimeInputs = requiredTools pkgs;
+              text = ''
+                ${./run-copier.sh} ${./.} "$@"
+              '';
+            };
+          in
+          {
+            type = "app";
+            program = "${package}/bin/run-copier";
+          };
+      });
+    };
+}

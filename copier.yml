@@ -1,0 +1,12 @@
+title:
+  type: str
+  help: What should be the title of the readme?
+
+github_repo:
+  type: str
+  help: How will the git repository be called on GitHub (`user/repo`)?
+
+_subdirectory: "template"
+
+_tasks:
+  - nix --extra-experimental-features 'nix-command flakes' flake lock "path:."

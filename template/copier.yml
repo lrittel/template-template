@@ -1,0 +1,5 @@
+readme_title:
+  type: str
+  help: What should the title of the readme be?
+
+_subdirectory: "template"

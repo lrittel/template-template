@@ -1,0 +1,55 @@
+[group("test")]
+clean-test-projects:
+    find test -path "*/files" -exec rm -rf \{\} \+
+
+[group("test")]
+[positional-arguments]
+_create-test-project name *EXTRA_ARGS:
+    mkdir -p "test/{{ name }}/files"
+
+    shift && \
+        copier copy . "test/{{ name }}/files" --trust \
+            "$@"
+
+    direnv allow "test/{{ name }}/files"
+
+[group("test")]
+create-test-projects: clean-test-projects
+    mkdir -p test
+
+    # Example test case
+    just _create-test-project example \
+        --data readme_title="Test case"
+
+[group("test")]
+_run-test name:
+    #!/usr/bin/env bash
+    set -euxo pipefail
+
+    test_dir="$(realpath "test/{{ name }}")"
+    test_script="$(realpath "$test_dir/run_test.sh")"
+
+    # cd to control the directory that gets mounted into the Docker container.
+    cd "$test_dir/files"
+
+    if [ -x "$test_script" ]; then
+        echo "running $test_script ..."
+        # Avoid infinite recursion in case of bugs.
+        export JUSTFILE_CEILING="$test_dir"
+        direnv exec "." "$test_script"
+        echo "$test_script done"
+    else
+        echo "$test_script does not exist, skipping tests for \"{{ name }}\""
+    fi
+
+[group("test")]
+run-tests: \
+        clean-test-projects \
+        create-test-projects
+    #!/usr/bin/env bash
+    set -euxo pipefail
+
+    for d in test/*; do
+        just _run-test "$(basename "$d")"
+    done
+
