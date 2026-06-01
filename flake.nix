@@ -52,7 +52,7 @@
               name = "run-copier";
               runtimeInputs = requiredTools pkgs;
               text = ''
-                ${./run-copier.sh} ${./.} "$@"
+                ${./run-copier.sh} gh:lrittel/template-template "$@"
               '';
             };
           in
