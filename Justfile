@@ -40,10 +40,16 @@ _create-test-project name *EXTRA_ARGS:
 create-test-projects: clean-test-projects
     mkdir -p test
 
-    # Create a basic template
-    just _create-test-project empty \
-        --data title="Test project template" \
+    # Create a basic template using copier directly
+    just _create-test-project copier \
+        --data title="Test project template (copier)" \
         --data github_repo="test-user/test-repo"
+
+    # Create a basic template using nix run
+    nix run "." -- copy test/nix-run/files --trust \
+        --data title="Test project template (nix run)" \
+        --data github_repo="test-user/test-repo"
+    direnv allow test/nix-run/files
 
 [group("test")]
 _run-test name:
