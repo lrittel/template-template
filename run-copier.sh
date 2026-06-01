@@ -51,8 +51,11 @@ SUBCOMMAND="$1"
 shift
 
 case "$SUBCOMMAND" in
-    copy | update | recopy | migrate)
+    copy)
         exec copier "$SUBCOMMAND" "$TEMPLATE" "$@"
+        ;;
+    update | recopy | migrate)
+        exec copier "$SUBCOMMAND" "$@"
         ;;
     -h | --help)
         usage
